@@ -137,3 +137,9 @@ import sys
 if sys.platform == 'win32':
     CELERY_WORKER_POOL = 'solo'
 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "testerdjango257@gmail.com"  # เปลี่ยนเป็นอีเมลจริง
+EMAIL_HOST_PASSWORD = "mlkc wond pkay mnca"  # แนะนำให้ใช้ App Password แทน
