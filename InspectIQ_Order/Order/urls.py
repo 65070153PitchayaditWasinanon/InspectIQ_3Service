@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CheckAuthStatusView
+# from .views import CheckAuthStatusView
 from .views import CreateRequestView, CreateOrderView, AcceptRequestView, NotifyProviderView
 
 urlpatterns = [

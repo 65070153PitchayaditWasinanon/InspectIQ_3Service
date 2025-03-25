@@ -31,18 +31,14 @@ def process_order(order_id):
     return {"status": "approved", "order_id": order_id}
 
 @shared_task
-def notify_provider(request_id, topic, status, recipient_email):
+def notify_provider(request_id, topic, status, recipient_email, user_id):
     try:
-        # req = Request.objects.get(id=request_id)
-
         # # ส่งแจ้งเตือนไปยัง Provider (เช่น Webhook, Email)
-        # message = {"request_id": str(req.id), "topic": req.topic, "status": req.status}
-        # response = requests.post("http://127.0.0.1:8001/orders/notify/", json=message)
+        message2 = {"recipient_email": recipient_email, "user": user_id , "request_id": request_id , "topic": topic, "status": status}
+        response = requests.post("http://127.0.0.1:8002/notify/create-notification/", json=message2)
 
-        # print(f"Notification sent: {response.status_code}")
-        # # 
-        # return {"status": "notified", "request_id": request_id}
-        # 
+        print(f"Notification sent: {response.status_code}")
+
         subject = f"Notification: {topic}"
         message = f"Request {request_id} is now {status}."
     
@@ -52,6 +48,4 @@ def notify_provider(request_id, topic, status, recipient_email):
     
     except Request.DoesNotExist:
         return {"error": "Request not found"}
-    # print(f"Processing order {request_id}")
-    # # คุณสามารถใส่ logic การประมวลผลจริงที่นี่ได้
-    # return {"status": "approved22asdfsadf", "order_id": request_id}
+
