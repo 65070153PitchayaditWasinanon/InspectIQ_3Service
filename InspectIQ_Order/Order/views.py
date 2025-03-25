@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
 from .models import Request
-from .tasks import process_request, process_order
+from .tasks import process_request, process_order, notify_provider
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CreateRequestView(View):
@@ -15,6 +15,7 @@ class CreateRequestView(View):
             topic = data.get("topic")
             description = data.get("description")
             category = data.get("category", [])
+            recipient_email = "fraction042@gmail.com"
 
             new_request = Request.objects.create(
                 user_id=user_id,
@@ -23,8 +24,9 @@ class CreateRequestView(View):
                 category=category
             )
 
+            task = notify_provider.delay(new_request.id, topic, new_request.status, recipient_email)
             # ส่งไปให้ Celery ทำงาน
-            task = process_request.delay(str(new_request.id))
+            # task = process_request.delay(str(new_request.id))
 
             return JsonResponse({"message": "Request received", "task_id": task.id, "request_id": str(new_request.id)})
 
@@ -35,7 +37,37 @@ class CreateRequestView(View):
 
     def get(self, request, *args, **kwargs):
         return JsonResponse({"error": "Method not allowed"}, status=405) # or return a help message.
+    
+@method_decorator(csrf_exempt, name='dispatch')
+class AcceptRequestView(View):
+    def put(self, request, *args, **kwargs):
+        try:
+            data = json.loads(request.body)
+            request_id = data.get("request_id")
 
+            req = Request.objects.get(id=request_id)
+
+            status = data.get("status")
+
+            req.status = status
+            
+            req.save()
+
+            if status == "approved":
+
+                # task = notify_provider.delay(request_id)
+                return JsonResponse({"message": "Request accepted successfully","task_id": "task.id", "request_id": str(request_id)})
+            else:
+                return JsonResponse({"status": "Request is rejected"})
+
+            # {"status": "Request is approved"}
+            # return JsonResponse()
+
+        except Request.DoesNotExist:
+            return JsonResponse({"error": "Request not found"}, status=404)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+        
 @method_decorator(csrf_exempt, name='dispatch')
 class CreateOrderView(View):
     def post(self, request, *args, **kwargs):
@@ -79,3 +111,31 @@ class CheckAuthStatusView(APIView):
         if response.status_code == 200:
             return Response(response.json())  # ส่งข้อมูล User กลับไป
         return Response({"error": "Unauthorized"}, status=401)
+
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class NotifyProviderView(View):
+    def post(self, request, *args, **kwargs):
+        try:
+            # รับข้อมูล JSON ที่ส่งมาใน body
+            data = json.loads(request.body)
+            request_id = data.get("request_id")
+            # topic = data.get("topic")
+            # status = data.get("status")
+
+            # อัปเดตหรือสร้าง Notification ใหม่
+            # notification, created = Notification.objects.update_or_create(
+            #     request_id=request_id,
+            #     defaults={"topic": topic, "status": status}
+            # )
+
+            # ส่ง Response กลับ
+            return JsonResponse({
+                "message": "Notification saved",
+                "request_id": request_id
+            }, status=200)
+           
+            # "created": created  # True ถ้าเป็นการสร้างใหม่, False ถ้าเป็นการอัปเดต
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)

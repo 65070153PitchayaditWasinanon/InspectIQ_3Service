@@ -140,3 +140,9 @@ if sys.platform == 'win32':
 AUTH_SERVER_URL = "http://127.0.0.1:8002/api/check-login/"
 TOKEN_SERVER_URL = "http://127.0.0.1:8002/api/get-token/"
 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "testerdjango257@gmail.com"  # เปลี่ยนเป็นอีเมลจริง
+EMAIL_HOST_PASSWORD = "mlkc wond pkay mnca"  # แนะนำให้ใช้ App Password แทน
