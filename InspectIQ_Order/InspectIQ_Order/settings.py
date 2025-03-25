@@ -81,7 +81,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "order_db",
         "USER": "postgres",
-        "PASSWORD": "xI3vcksuno",
+        "PASSWORD": "0930038864",
         "HOST": "localhost",
         "PORT": "8000",
     }
@@ -136,4 +136,7 @@ CELERY_TASK_SERIALIZER = "json"
 import sys
 if sys.platform == 'win32':
     CELERY_WORKER_POOL = 'solo'
+
+AUTH_SERVER_URL = "http://127.0.0.1:8002/api/check-login/"
+TOKEN_SERVER_URL = "http://127.0.0.1:8002/api/get-token/"
 

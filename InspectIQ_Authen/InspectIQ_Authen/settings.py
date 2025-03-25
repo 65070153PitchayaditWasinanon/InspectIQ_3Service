@@ -37,7 +37,36 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "Authen",
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',  # ใช้ Google OAuth2
+    'rest_framework',  # ใช้ Django REST Framework สำหรับ API
+    'corsheaders',  # อนุญาตให้ Frontend เรียก API ได้
 ]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',  # ใช้ allauth เป็น backend
+]
+
+SITE_ID = 1  # ใช้ค่า default
+ACCOUNT_EMAIL_REQUIRED = True  # ต้องใช้ Email
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_VERIFICATION = 'none'  # ปิดการยืนยัน Email
+
+# Google OAuth2 Settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': ['email', 'profile'],  # ขอบเขตของข้อมูลที่ขอจาก Google
+        'AUTH_PARAMS': {'access_type': 'online'},
+        'OAUTH_PKCE_ENABLED': True,
+    }
+}
+
+# ตั้งค่า CORS ให้ API สามารถใช้งานข้าม Project ได้
+CORS_ALLOW_ALL_ORIGINS = True  # ให้ทุกเว็บสามารถใช้ API ได้
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -47,6 +76,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 🔹 เพิ่ม Middleware ของ allauth
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'InspectIQ_Authen.urls'
@@ -74,9 +105,13 @@ WSGI_APPLICATION = 'InspectIQ_Authen.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "authen_db",
+        "USER": "postgres",
+        "PASSWORD": "0930038864",
+        "HOST": "localhost",
+        "PORT": "8000",
     }
 }
 

@@ -15,8 +15,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from Authen.views import ProfileView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', include('allauth.urls')),  # ใช้ allauth สำหรับ Google Login
+    path('accounts/profile/', ProfileView.as_view(), name='profile'),
+    path("api/", include('Authen.urls')),  # API สำหรับเช็คสถานะ Login
 ]
