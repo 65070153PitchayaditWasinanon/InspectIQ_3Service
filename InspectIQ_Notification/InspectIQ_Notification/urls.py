@@ -1,5 +1,5 @@
 """
-URL configuration for InspectIQ_Authen project.
+URL configuration for InspectIQ_Notification project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.1/topics/http/urls/
@@ -15,12 +15,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
-from Authen.views import ProfileView
+from django.urls import path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('allauth.urls')),  # ใช้ allauth สำหรับ Google Login
-    path('accounts/profile/', ProfileView.as_view(), name='profile'),
-    path("api/", include('Authen.urls')),  # API สำหรับเช็คสถานะ Login
 ]
