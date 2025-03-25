@@ -5,6 +5,7 @@ from django.utils.decorators import method_decorator
 import json
 from .models import Request
 from .tasks import process_request, process_order, notify_provider
+from django.contrib.auth.models import User
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CreateRequestView(View):
@@ -44,19 +45,23 @@ class AcceptRequestView(View):
         try:
             data = json.loads(request.body)
             request_id = data.get("request_id")
-
-            req = Request.objects.get(id=request_id)
-
+            # user_id = data.get("user_id")
             status = data.get("status")
 
+            
+            # recipient_email = "fraction042@gmail.com"
+
+            req = Request.objects.get(id=request_id)
+            user1 = User.objects.get(id=req.user.id)
             req.status = status
             
             req.save()
 
-            if status == "approved":
+            if status == "approved" or status == "completed":
 
                 # task = notify_provider.delay(request_id)
-                return JsonResponse({"message": "Request accepted successfully","task_id": "task.id", "request_id": str(request_id)})
+                task = notify_provider.delay(request_id, req.topic, req.status, user1.email)
+                return JsonResponse({"message": "Request accepted successfully","task_id": task.id, "request_id": str(request_id)})
             else:
                 return JsonResponse({"status": "Request is rejected"})
 
