@@ -36,3 +36,33 @@ class GetUserTokenView(APIView):
             return Response({"token": token.token})
         except SocialToken.DoesNotExist:
             return Response({"error": "Token not found"}, status=404)
+
+
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class UserProfileAPIView(APIView):
+
+    def get(self, request, user_id=None):
+        try:
+            # ถ้าไม่มี user_id -> ดึงข้อมูลของตัวเอง
+            if user_id is None:
+                user = request.user
+            else:
+                user = User.objects.get(id=user_id)
+
+            return Response({
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "first_name": user.first_name,
+                "last_name": user.last_name
+            })
+        
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=404)

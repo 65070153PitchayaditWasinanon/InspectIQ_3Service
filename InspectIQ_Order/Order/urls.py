@@ -7,4 +7,5 @@ urlpatterns = [
     path('create_order/', CreateOrderView.as_view(), name='create_order'),
     path("accept/", AcceptRequestView.as_view(), name="accept_request"),
     path('notify/', NotifyProviderView.as_view(), name='notify_provider'),
+
 ]

@@ -38,7 +38,7 @@ class CreateRequestView(View):
 
     def get(self, request, *args, **kwargs):
         return JsonResponse({"error": "Method not allowed"}, status=405) # or return a help message.
-    
+
 @method_decorator(csrf_exempt, name='dispatch')
 class AcceptRequestView(View):
     def put(self, request, *args, **kwargs):
