@@ -1,84 +1,40 @@
 {% load socialaccount %}
+{% load static %}
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/signup.css' %}">
     <title>Sign Up</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f4f4f4;
-        }
-        .signup-container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        .signup-container h2 {
-            margin-bottom: 20px;
-        }
-        .signup-form input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .signup-form button {
-            width: 100%;
-            padding: 10px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .signup-form button:hover {
-            background: #0056b3;
-        }
-        .google-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: white;
-            border: 1px solid #ccc;
-            padding: 10px;
-            width: 100%;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-        .google-btn img {
-            width: 20px;
-            margin-right: 10px;
-        }
-    </style>
 </head>
+
 <body>
     <div class="signup-container">
-        <h2>Sign Up</h2>
+        <h2 id="Sign-up-logo-upper">Sign Up</h2>
         <form class="signup-form" method="POST" action="{% url 'account_signup' %}">
             {% csrf_token %}
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="email" name="email" placeholder="Email" required>
-            <input type="password" name="password1" placeholder="Password" required>
-            <input type="password" name="password2" placeholder="Confirm Password" required>
-            <button type="submit">Sign Up</button>
+            <center>
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="password" name="password1" placeholder="Password" required>
+                <input type="password" name="password2" placeholder="Confirm Password" required>
+                <div id="sign-up-btn">
+                    <button type="submit">Sign Up</button>
+                </div>
+            </center>
         </form>
         <p>Or sign up with:</p>
-        <a class="google-btn" href="{% provider_login_url 'google' %}">
-            <img src="https://img.icons8.com/color/48/000000/google-logo.png"/>
-            Sign Up with Google
-        </a>
+        <center>
+            <a class="google-btn" href="{% provider_login_url 'google' %}">
+                <img src="https://img.icons8.com/color/48/000000/google-logo.png" />
+                Sign Up with Google
+            </a>
+        </center>
         <p>Already have an account? <a href="{% url 'account_login' %}">Sign In</a></p>
     </div>
 </body>
+
 </html>
