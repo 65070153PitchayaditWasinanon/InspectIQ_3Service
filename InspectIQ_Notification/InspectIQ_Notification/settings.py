@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'Notify',
 ]
 
 MIDDLEWARE = [
@@ -74,9 +75,13 @@ WSGI_APPLICATION = 'InspectIQ_Notification.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "notification_db",
+        "USER": "postgres",
+        "PASSWORD": "xI3vcksuno",
+        "HOST": "localhost",
+        "PORT": "8000",
     }
 }
 
@@ -121,3 +126,23 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CELERY_BROKER_URL = "pyamqp://guest@localhost//"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+
+import sys
+if sys.platform == 'win32':
+    CELERY_WORKER_POOL = 'solo'
+
+AUTH_SERVER_URL = "http://127.0.0.1:8002/api/check-login/"
+TOKEN_SERVER_URL = "http://127.0.0.1:8002/api/get-token/"
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "testerdjango257@gmail.com"  # เปลี่ยนเป็นอีเมลจริง
+EMAIL_HOST_PASSWORD = "mlkc wond pkay mnca"  # แนะนำให้ใช้ App Password แทน

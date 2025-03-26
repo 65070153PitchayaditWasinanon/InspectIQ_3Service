@@ -5,6 +5,7 @@ from django.utils.decorators import method_decorator
 import json
 from .models import Request
 from .tasks import process_request, process_order, notify_provider
+from django.contrib.auth.models import User
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CreateRequestView(View):
@@ -24,7 +25,7 @@ class CreateRequestView(View):
                 category=category
             )
 
-            task = notify_provider.delay(new_request.id, topic, new_request.status, recipient_email)
+            task = notify_provider.delay(new_request.id, topic, new_request.status, recipient_email, user_id)
             # ส่งไปให้ Celery ทำงาน
             # task = process_request.delay(str(new_request.id))
 
@@ -44,19 +45,23 @@ class AcceptRequestView(View):
         try:
             data = json.loads(request.body)
             request_id = data.get("request_id")
-
-            req = Request.objects.get(id=request_id)
-
+            # user_id = data.get("user_id")
             status = data.get("status")
 
+            
+            # recipient_email = "fraction042@gmail.com"
+
+            req = Request.objects.get(id=request_id)
+            user1 = User.objects.get(id=req.user.id)
             req.status = status
             
             req.save()
 
-            if status == "approved":
+            if status == "approved" or status == "completed":
 
                 # task = notify_provider.delay(request_id)
-                return JsonResponse({"message": "Request accepted successfully","task_id": "task.id", "request_id": str(request_id)})
+                task = notify_provider.delay(request_id, req.topic, req.status, user1.email, user1.id)
+                return JsonResponse({"message": "Request accepted successfully","task_id": task.id, "request_id": str(request_id)})
             else:
                 return JsonResponse({"status": "Request is rejected"})
 
@@ -88,33 +93,7 @@ class CreateOrderView(View):
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
 
-# OAuth2 Google Account
-
-import requests
-from django.conf import settings
-from rest_framework.views import APIView
-from rest_framework.response import Response
-
-class CheckAuthStatusView(APIView):
-    """
-    เรียก API จาก `Authen` เพื่อตรวจสอบว่าผู้ใช้ Login แล้วหรือยัง
-    """
-
-    def get(self, request):
-        token = request.headers.get("Authorization")  # ดึง Token จาก Header
-        if not token:
-            return Response({"error": "Missing Token"}, status=401)
-
-        headers = {"Authorization": f"Bearer {token}"}
-        response = requests.get(settings.AUTH_SERVER_URL, headers=headers)  # เช็คสถานะการล็อกอิน
-
-        if response.status_code == 200:
-            return Response(response.json())  # ส่งข้อมูล User กลับไป
-        return Response({"error": "Unauthorized"}, status=401)
-
-
-
-@method_decorator(csrf_exempt, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')      
 class NotifyProviderView(View):
     def post(self, request, *args, **kwargs):
         try:
