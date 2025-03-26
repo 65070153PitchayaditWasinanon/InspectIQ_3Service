@@ -14,7 +14,8 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from drf_yasg import openapi
 
-AUTHEN_SERVICE_URL = "http://127.0.0.1:8001/api/users/"
+AUTHEN_SERVICE_URL = "http://127.0.0.1:8001/api/api/user/"
+
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -59,8 +60,6 @@ class CreateRequestView(APIView):
             )
 
             task = notify_provider.delay(new_request.id, topic, new_request.status, recipient_email, user_id)
-            # ส่งไปให้ Celery ทำงาน
-            # task = process_request.delay(str(new_request.id))
 
             return JsonResponse({"message": "Request received", "task_id": task.id, "request_id": str(new_request.id)})
 
@@ -69,8 +68,7 @@ class CreateRequestView(APIView):
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
 
-    def get(self, request, *args, **kwargs):
-        return JsonResponse({"error": "Method not allowed"}, status=405) # or return a help message.
+
 
     
 @method_decorator(csrf_exempt, name='dispatch')
@@ -104,42 +102,33 @@ class AcceptRequestView(APIView):
         try:
             data = json.loads(request.body)
             request_id = data.get("request_id")
-            # user_id = data.get("user_id")
             status = data.get("status")
             start_date = data.get("start_date")
             end_date = data.get("end_date")
             iot_set_id = data.get("iot_set_id")
 
             req = Request.objects.get(id=request_id)
-            # user1 = User.objects.get(id=req.user.id)
+
             req.status = status
             
             req.save()
 
-            # user_response = requests.get(f"{AUTHEN_SERVICE_URL}{req.user_id}/") #ได้รับ user จาก inspectIQ_Authen
+            user_response = requests.get(f"{AUTHEN_SERVICE_URL}{req.user_id}/") 
 
-            # if user_response.status_code != 200:
-            #     return JsonResponse({"error": "User not found in Authen Service"}, status=404)
+            if user_response.status_code != 200:
+                return JsonResponse({"error": "User not found in Authen Service"}, status=404)
             
-            # user_data = user_response.json()
-            # user_email = user_data.get("email")  # สมมติว่าเราใช้ username เป็นตัวอย่าง
+            user_data = user_response.json()
+            user_email = user_data.get("email")  
             
-            # recipient_email = "fraction042@gmail.com"
-
-            
-
             if status == "approved":
-
-                # task = notify_provider.delay(request_id)
                 
-                # task = notify_provider.delay(request_id, req.topic, req.status, user_email, req.user_id)
+                task = notify_provider.delay(request_id, req.topic, req.status, user_email, req.user_id)
                 task2 = create_tracking.delay(request_id, start_date, end_date, iot_set_id)
-                return JsonResponse({"message": "Request accepted successfully","task_id": task2.id, "request_id": str(request_id)})
+                return JsonResponse({"message": "Request accepted successfully","task1_id": task.id ,"task2_id": task2.id, "request_id": str(request_id)})
             else:
                 return JsonResponse({"status": "Request is rejected"})
 
-            # {"status": "Request is approved"}
-            # return JsonResponse()
 
         except Request.DoesNotExist:
             return JsonResponse({"error": "Request not found"}, status=404)

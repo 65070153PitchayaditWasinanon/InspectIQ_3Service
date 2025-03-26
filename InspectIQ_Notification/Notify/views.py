@@ -12,23 +12,21 @@ class CreateLogNotifyView(View):
         try:
             data = json.loads(request.body)
             recipient_email = data.get("recipient_email")
-            user_id = data.get("user")  # ✅ เปลี่ยนเป็น user_id
+            user_id = data.get("user")  
             request_id = data.get("request_id")
             topic = data.get("topic")
             status = data.get("status")
-            # category = data.get("category", [])
-            # recipient_email = "fraction042@gmail.com"
+            
             
             
             new_notification = Notification.objects.create(
                 recipient_email=recipient_email,
-                user_id=user_id,  # ✅ ใช้ user object ไม่ใช่ user_id
+                user_id=user_id,  
                 request_id=request_id,
                 topic=topic,
                 status=status
             )
-            # ส่งไปให้ Celery ทำงาน
-            # task = process_request.delay(str(new_request.id))
+            
 
             return JsonResponse({"message": "Request received", "request_id": str(new_notification.id)})
 

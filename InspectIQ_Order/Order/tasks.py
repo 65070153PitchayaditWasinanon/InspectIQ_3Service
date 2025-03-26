@@ -10,7 +10,7 @@ from django.core.mail import send_mail
 def notify_provider(request_id, topic, status, recipient_email, user_id):
     try:
         # # ส่งแจ้งเตือนไปยัง Provider (เช่น Webhook, Email)
-        message2 = {"recipient_email": recipient_email, "user": user_id , "request_id": request_id , "topic": topic, "status": status}
+        message2 = {"recipient_email": recipient_email, "user": user_id , "request_id": str(request_id) , "topic": topic, "status": status}
         response = requests.post("http://127.0.0.1:8002/notify/create-notification/", json=message2)
 
         print(f"Notification sent: {response.status_code}")
