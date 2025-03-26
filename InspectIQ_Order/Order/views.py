@@ -16,7 +16,7 @@ from drf_yasg import openapi
 
 AUTHEN_SERVICE_URL = "http://127.0.0.1:8001/api/api/user/"
 
-
+AUTHEN_SERVICE_URL_2 = "http://127.0.0.1:8005/api/latest-iot-device/"
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CreateRequestView(APIView):
@@ -105,7 +105,14 @@ class AcceptRequestView(APIView):
             status = data.get("status")
             start_date = data.get("start_date")
             end_date = data.get("end_date")
-            iot_set_id = data.get("iot_set_id")
+            # iot_set_id = data.get("iot_set_id")
+
+            IoT_response = requests.get(f"{AUTHEN_SERVICE_URL_2}") 
+
+            if IoT_response.status_code != 200:
+                return JsonResponse({"error": "User not found in Authen Service"}, status=404)
+
+            IoT_data = IoT_response.json()
 
             req = Request.objects.get(id=request_id)
 
@@ -119,12 +126,12 @@ class AcceptRequestView(APIView):
                 return JsonResponse({"error": "User not found in Authen Service"}, status=404)
             
             user_data = user_response.json()
-            user_email = user_data.get("email")  
+            user_email = user_data.get("email")
             
             if status == "approved":
                 
                 task = notify_provider.delay(request_id, req.topic, req.status, user_email, req.user_id)
-                task2 = create_tracking.delay(request_id, start_date, end_date, iot_set_id)
+                task2 = create_tracking.delay(request_id, start_date, end_date, IoT_data)
                 return JsonResponse({"message": "Request accepted successfully","task1_id": task.id ,"task2_id": task2.id, "request_id": str(request_id)})
             else:
                 return JsonResponse({"status": "Request is rejected"})

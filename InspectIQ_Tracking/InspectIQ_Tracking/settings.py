@@ -79,7 +79,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "tracking_db",
         "USER": "postgres",
-        "PASSWORD": "xI3vcksuno",
+        "PASSWORD": "0930038864",
         "HOST": "localhost",
         "PORT": "8000",
     }
@@ -127,3 +127,23 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CELERY_BROKER_URL = "pyamqp://guest@localhost//"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+
+import sys
+if sys.platform == 'win32':
+    CELERY_WORKER_POOL = 'solo'
+
+AUTH_SERVER_URL = "http://127.0.0.1:8002/api/check-login/"
+TOKEN_SERVER_URL = "http://127.0.0.1:8002/api/get-token/"
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "testerdjango257@gmail.com"  # เปลี่ยนเป็นอีเมลจริง
+EMAIL_HOST_PASSWORD = "mlkc wond pkay mnca"  # แนะนำให้ใช้ App Password แทน
