@@ -2,6 +2,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from allauth.socialaccount.models import SocialToken
+from rest_framework import status
+from django.shortcuts import get_object_or_404
+
+from rest_framework import generics
+# from .models import User
+# from .serializers import UserSerializer
 
 from django.views.generic import TemplateView
 
@@ -36,8 +42,6 @@ class GetUserTokenView(APIView):
             return Response({"token": token.token})
         except SocialToken.DoesNotExist:
             return Response({"error": "Token not found"}, status=404)
-
-
 
 from rest_framework.views import APIView
 from rest_framework.response import Response

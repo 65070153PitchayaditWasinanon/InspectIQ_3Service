@@ -6,7 +6,7 @@ User = get_user_model()  # ใช้ User จาก Authen Service
 
 class Request(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  # คนส่งคำขอ (Customer)
+    user_id = models.IntegerField(null=True)  # คนส่งคำขอ (Customer)
     topic = models.CharField(max_length=255)
     date = models.DateField(auto_now_add=True)
     description = models.TextField()
